@@ -1,0 +1,26 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('f1statistics.csv',delimiter=';')  # загрузка данных
+print(df.head())  # просмотр первых строк таблицы
+# нормализация данных, потому что слишком сильно отличаются масштаб
+print(df.columns)
+from sklearn.preprocessing import MinMaxScaler
+
+scaler = MinMaxScaler()  # инициализация нормализатора
+features_to_scale = ['count_drs', 'freq_drs', 'over', 'freq_over',
+       'start', 'humidity', 'air_temp', 'track_temp',
+       'pressure', 'rain', 'wind_speed']
+# выбираем нужные признаки
+scaled_features = scaler.fit_transform(df[features_to_scale])
+df_scaled = pd.DataFrame(scaled_features, columns=features_to_scale)
+df_scaled['finish'] = df['finish']  # добавляем обратно итоговую позицию
+
+corrmatrix = df_scaled.corr()
+plt.figure(figsize=(12, 10))  # Размер фигуры (ширина, высота)
+sns.heatmap(corrmatrix, annot=True, fmt=".2f", cmap="coolwarm", linewidths=.5)
+plt.title("Корреляционная матрица признаков с нормальзованными значениям")
+plt.show()
+
